@@ -26,3 +26,8 @@ EXPOSE 3000
 ENTRYPOINT ["/sbin/tini", "--"]
 
 CMD [ "npm", "start" ]
+
+# add VCS labels
+ARG VCS_REF="local"
+LABEL org.label-schema.vcs-ref=$VCS_REF \          
+      org.label-schema.vcs-url="https://github.com/alexei-led/todomvc-express.git"
