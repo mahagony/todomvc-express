@@ -22,7 +22,7 @@ docker run -d --name socat-nid --network=container:todomvc local/socat socat TCP
 TODOMVC_IP=$(docker inspect -f "{{.NetworkSettings.IPAddress}}" todomvc)
 
 # run socat container to expose Node.js debugger agent port forwarder
-docker run -d -p 5858:5858 --name socat local/socat socat TCP-LISTEN:5858,fork TCP:${TODOMVC_IP:4848
+docker run -d -p 5858:5858 --name socat local/socat socat TCP-LISTEN:5858,fork TCP:${TODOMVC_IP}:4848
 
 node debug http://localhost:5858
 ```
