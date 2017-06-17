@@ -1,3 +1,32 @@
+# Debugging remote Node.js application running in a Docker container
+
+[https://codefresh.io/blog/debug_node_in_docker/](https://codefresh.io/blog/debug_node_in_docker/)
+
+```
+# build Docker image; set VCS_REF to current HEAD commit (short)
+docker build -t local/todomvc --build-arg VCS_REF=$(git rev-parse --short HEAD)
+# run TodoMVC in a Docker container
+docker run -d -p 3000:3000 --name todomvc local/todomvc node src/start.js
+
+# send SIGUSR1 with docker kill (if using proper init process)
+docker kill --signal SIGUSR1 todomvc
+# OR run kill command for node process inside todomvc container
+docker exec -it todomvc sh -c 'kill -s SIGUSR1 $(pidof -s node)'
+
+docker build -t local/socat - < socat.Dockerfile
+
+# define local port forwarding
+docker run -d --name socat-nid --network=container:todomvc local/socat socat TCP-LISTEN:4848,fork TCP:127.0.0.1:5858
+
+# get IP of todomvc container
+TODOMVC_IP=$(docker inspect -f "{{.NetworkSettings.IPAddress}}" todomvc)
+
+# run socat container to expose Node.js debugger agent port forwarder
+docker run -d -p 5858:5858 --name socat local/socat socat TCP-LISTEN:5858,fork TCP:${TODOMVC_IP:4848
+
+node debug http://localhost:5858
+```
+
 # todomvc-express
 > TodoMVC with server-side rendering
 
